@@ -45,17 +45,20 @@ export class LinkController {
     const link_p: string = data.link_panjang;
     if (data) {
       return res.redirect(link_p);
+    } else {
+      res.status(HttpStatus.NOT_FOUND).send();
     }
 
   }
 
   @Patch()
   async customurl(@Body() updateLink: dtoUpdateUrl, @Res() res: Response): Promise<void> {
-    const data = await this.serviceLink.updateurl(updateLink.link_pendek, updateLink.custom);
-    if (!data) {
-      res.status(HttpStatus.NOT_FOUND).send();
-    } else {
+    const cek = await this.serviceLink.geturl(updateLink.custom);
+    if (!cek) {
+      const data = await this.serviceLink.updateurl(updateLink.link_pendek, updateLink.custom);
       res.status(HttpStatus.OK).send();
+    } else {
+      res.status(HttpStatus.CONFLICT).send();
     }
   }
 
